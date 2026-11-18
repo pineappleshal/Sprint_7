@@ -1,0 +1,11 @@
+{
+  "name": "Sprint_7 — тестирование API Самоката",
+  "plugins": {
+    "awesome": {
+      "options": {
+        "singleFile": true,
+        "reportLanguage": "ru"
+      }
+    }
+  }
+}
