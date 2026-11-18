@@ -6,6 +6,12 @@ CREATE_MISSING_DATA = 'Недостаточно данных для создан
 LOGIN_MISSING_DATA = 'Недостаточно данных для входа'
 ACCOUNT_NOT_FOUND = 'Учетная запись не найдена'
 DUPLICATE_LOGIN = 'Этот логин уже используется'
+DELETE_MISSING_ID = 'Недостаточно данных для удаления курьера'
+COURIER_NOT_FOUND = 'Курьера с таким id нет'
+SEARCH_MISSING_DATA = 'Недостаточно данных для поиска'
+ACCEPT_COURIER_NOT_FOUND = 'Курьера с таким id не существует'
+ACCEPT_ORDER_NOT_FOUND = 'Заказа с таким id не существует'
+ORDER_NOT_FOUND = 'Заказ не найден'
 
 
 def make_courier():
