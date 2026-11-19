@@ -1,0 +1,258 @@
+{
+  "info": {
+    "name": "Sprint_7 — Яндекс Самокат API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Базовая проверка API. Запускайте все запросы по порядку: последние два очищают созданные данные."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://qa-scooter.education-services.ru/api/v1"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Создать уникального курьера",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/courier",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"login\": \"{{login}}\",\n  \"password\": \"{{password}}\",\n  \"firstName\": \"Valeriia\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('login', 'sprint7_postman_' + pm.variables.replaceIn('{{$guid}}'));",
+              "pm.collectionVariables.set('password', pm.variables.replaceIn('{{$guid}}'));",
+              "pm.collectionVariables.set('deliveryDate', new Date(Date.now()+172800000).toISOString().slice(0,10));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+              "pm.test('ok = true', () => pm.expect(pm.response.json()).to.eql({ok:true}));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Войти и сохранить id",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/courier/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"login\": \"{{login}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('id — число', () => pm.expect(pm.response.json().id).to.be.a('number'));",
+              "pm.collectionVariables.set('courierId', pm.response.json().id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Повторный логин занят",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/courier",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"login\": \"{{login}}\",\n  \"password\": \"{{password}}\",\n  \"firstName\": \"Valeriia\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 409', () => pm.response.to.have.status(409));",
+              "pm.test('Ошибка занятого логина', () => pm.expect(pm.response.json().message).to.include('Этот логин уже используется'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Вход без логина",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/courier/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', () => pm.response.to.have.status(400));",
+              "pm.test('Недостаточно данных', () => pm.expect(pm.response.json().message).to.eql('Недостаточно данных для входа'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Создать заказ",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Анна\",\n  \"lastName\": \"Иванова\",\n  \"address\": \"Москва, улица Лесная, дом 10\",\n  \"metroStation\": \"4\",\n  \"phone\": \"+79000000001\",\n  \"rentTime\": 2,\n  \"deliveryDate\": \"{{deliveryDate}}\",\n  \"comment\": \"Учебный заказ Postman\",\n  \"color\": [\n    \"BLACK\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+              "pm.test('track — число', () => pm.expect(pm.response.json().track).to.be.a('number'));",
+              "pm.collectionVariables.set('track', pm.response.json().track);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Получить список заказов",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/orders?limit=10&page=0"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('orders — массив', () => pm.expect(pm.response.json().orders).to.be.an('array'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Отменить созданный заказ",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": "{{baseUrl}}/orders/cancel?track={{track}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('ok = true', () => pm.expect(pm.response.json()).to.eql({ok:true}));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Удалить созданного курьера",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/courier/{{courierId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('ok = true', () => pm.expect(pm.response.json()).to.eql({ok:true}));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

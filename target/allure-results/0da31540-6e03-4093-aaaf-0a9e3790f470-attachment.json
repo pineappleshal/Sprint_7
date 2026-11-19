@@ -1,0 +1,15 @@
+{
+  "json": {
+    "firstName": "Анна",
+    "lastName": "Иванова",
+    "address": "Москва, улица Лесная, дом 10",
+    "metroStation": "4",
+    "phone": "+79000000001",
+    "rentTime": 2,
+    "deliveryDate": "2026-11-21",
+    "comment": "Учебный заказ f136fd3b1f824d14965cb6caa989a754",
+    "color": [
+      "GREY"
+    ]
+  }
+}
