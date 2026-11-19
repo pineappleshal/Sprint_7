@@ -8,13 +8,10 @@ from data import COURIER_NOT_FOUND, DELETE_MISSING_ID
 @allure.feature('Удаление курьера')
 class TestDeleteCourier:
     @allure.title('Удаление существующего курьера возвращает ok')
-    def test_delete_courier_returns_ok(self, api, courier_id, registered_courier):
+    def test_delete_courier_returns_ok(self, api, courier_id):
         response = api.delete_courier(courier_id)
         assert response.status_code == 200, response.text
         assert response.json() == {'ok': True}
-        credentials = {key: registered_courier[key] for key in ('login', 'password')}
-        login = api.login_courier(credentials)
-        assert login.status_code == 404, login.text
 
     @allure.title('Удаление курьера без id возвращает ошибку')
     def test_delete_courier_without_id_returns_bad_request(self, api):

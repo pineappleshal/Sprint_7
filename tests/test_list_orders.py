@@ -1,12 +1,12 @@
 import allure
+import pytest
 
 
 @allure.feature('Список заказов')
 class TestListOrders:
     @allure.title('Ответ содержит список заказов и сведения о пагинации')
-    def test_list_orders_returns_order_list(self, api, order_factory, order_payload):
-        created = order_factory(order_payload)
-        assert created.status_code == 201, created.text
+    @pytest.mark.usefixtures('created_order_track')
+    def test_list_orders_returns_order_list(self, api):
         response = api.list_orders(limit=10, page=0)
         assert response.status_code == 200, response.text
         body = response.json()
